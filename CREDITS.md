@@ -20,4 +20,4 @@ Lower bound. The embedding of the Sobolev space of order (e+3)/2 into the variat
 biases is due to T. Mao, J. W. Siegel and J. Xu (arXiv:2408.10996, Theorem 1). The variation norm is that of Bach and
 of J. W. Siegel and J. Xu (Found. Comput. Math. 2024).
 
-New in the paper: the lower bound of Theorem 1.2(b), and with it the exponent 2(d−1)/(d+2) of the class.
+New in the paper: the lower bound of Theorem 1.2(b), which together with the upper bound shows that the power of R for the class is 2(d−1)/(d+2).

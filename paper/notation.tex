@@ -1,5 +1,5 @@
 \section{Notation}\label{app:notation}
-Symbols are listed by the section in which they first appear. Letters used only inside one proof are listed at the end.
+For each symbol the table gives the place where it first appears. Letters used only inside one proof are listed at the end.
 
 {\small
 \begin{longtable}{@{}p{0.2\textwidth}p{0.5\textwidth}l@{}}
@@ -11,13 +11,14 @@ $n$ & width, the number of rows of $W$ & Section~\ref{sec:intro} \\
 $b$ & bound on the Euclidean norm of the output weights $u$ & Section~\ref{sec:intro} \\
 $B$ & bound on the Frobenius norm of the inner weights $W$ & Section~\ref{sec:intro} \\
 $b_x$ & radius of the input ball & Section~\ref{sec:intro} \\
+$u$, $W$ & output weight vector and inner weight matrix of a network in $\cF_n$ & Section~\ref{sec:intro} \\
 $\sigma$ & the ReLU function $\sigma(z)=\max\{z,0\}$ & Section~\ref{sec:intro} \\
 $X$ & the ball $\{x\in\RR^d:|x|\le b_x\}$ & Section~\ref{sec:intro} \\
 $\cF_n$ & networks $x\mapsto u^{T}\sigma(Wx)$ with $|u|\le b$ and $\|W\|_F\le B$ & Section~\ref{sec:intro} \\
 $\varepsilon$ & scale of shattering & Section~\ref{sec:intro} \\
 $N$ & number of shattered points & Section~\ref{sec:intro} \\
 $r$ & levels $r_1,\dots,r_N$ of a shattering & Section~\ref{sec:intro} \\
-$s$ & sign vector of a shattering; in Section~\ref{sec:lower} the Sobolev order $(d+2)/2$ & Section~\ref{sec:intro} \\
+$s$ & the Sobolev order $(e+3)/2=(d+2)/2$ & Section~\ref{sec:intro} \\
 $f$ & an element of a function class & Section~\ref{sec:intro} \\
 $\fat$ & fat-shattering dimension, $\fat_\varepsilon$ at scale $\varepsilon$ & Section~\ref{sec:intro} \\
 $R$ & the ratio $bBb_x/\varepsilon$ & Section~\ref{sec:intro} \\
@@ -28,33 +29,47 @@ $\delta$ & bump width in the lower bound & Section~\ref{sec:intro} \\
 $\eta$ & scale of a uniform or $L_2$ cover & Section~\ref{sec:intro} \\
 $\cF_n^{\mathrm{sp}}$ & as $\cF_n$, with the spectral norm $\|W\|\le B$ & Section~\ref{sec:intro} \\
 $\cF_n^{\beta}$ & networks $x\mapsto u^{T}\sigma(Wx-\beta\mathbf 1)$ with a common bias $\beta\ge0$, where $\mathbf 1\in\RR^n$ is the vector of ones & Section~\ref{sec:intro} \\
-$\tau$ & a finite positive measure on the sphere & Section~\ref{sec:intro} \\
+$\beta$ & the common bias of the neurons of $\cF_n^{\beta}$ & Section~\ref{sec:intro} \\
+$c_i$ & coefficients of a combination $\sum_ic_i\sigma(\omega_i\cdot x)$ of unit-norm neurons & Section~\ref{sec:intro} \\
+$\omega$, $t$ & unit direction and offset of a neuron, $\omega_i$ and $t_i$ & Section~\ref{sec:intro} \\
+$m$ & the width of the networks of Liu, Dadi and Cevher; the number of atoms of the discrete measure in Lemma~\ref{lem:zonoid} & Section~\ref{sec:intro} \\
+$\tau$ & a finite positive measure on the sphere & Section~\ref{sec:upper} \\
 $S^{e-1}$ & unit sphere of $\RR^e$ & Section~\ref{sec:prelim} \\
-$\cP^e$ & neurons $\sigma(\omega\cdot y+t)$, $\omega\in S^{e-1}$, $t\in[-1,1]$, on the unit ball & Section~\ref{sec:prelim} \\
-$a$ & coefficients $a_i$ of a finite combination & Section~\ref{sec:prelim} \\
+$\cP^e$ & neurons $\sigma(\omega\cdot y+t)$, $\omega\in S^{e-1}$, $t\in[-1,1]$, on the unit ball & Section~\ref{sec:intro} \\
+$a$ & coefficients $a_i$ of a finite combination; in Section~\ref{sec:intro} also a candidate bound in the infimum after Proposition~\ref{prop:bias} & Section~\ref{sec:intro} \\
 $g$ & an element of $L_2$ or of a cover & Section~\ref{sec:prelim} \\
 $B^e$ & closed unit ball of $\RR^e$ & Section~\ref{sec:prelim} \\
 $B_1(\cP^e)$ & closed absolutely convex hull of $\cP^e$ in $L_2(B^e)$ & Section~\ref{sec:prelim} \\
-$\|\cdot\|_{\mathcal K_1(\cP^e)}$, $\mathcal K_1(\cP^e)$ & variation norm and variation space of ReLU networks with biases & Section~\ref{sec:prelim} \\
+$\|\cdot\|_{\mathcal K_1(\cP^e)}$, $\mathcal K_1(\cP^e)$ & variation norm and variation space of ReLU networks with biases & Section~\ref{sec:intro} \\
 $\xi$ & frequency variable of the Fourier transform & Section~\ref{sec:prelim} \\
 $\|\cdot\|_{H^s}$ & Sobolev norm defined by the Fourier transform & Section~\ref{sec:prelim} \\
 $G$ & a finite cover & Lemma~\ref{lem:cover} \\
 $h_\tau$ & support function $\int|x\cdot y|\,d\tau(y)$ of a zonoid & Section~\ref{sec:upper} \\
+$y$ & a point of the hyperplane in the lower bound, of the sphere or of the unit ball & Section~\ref{sec:intro} \\
+$w'$ & the first $d-1$ coordinates of a weight vector $w=(w',w_d)$ & Section~\ref{sec:intro} \\
+$\cF$ & a class of real functions & Section~\ref{sec:intro} \\
 $A_d$ & constant in the zonoid approximation & Lemma~\ref{lem:zonoid} \\
-$v$ & directions $v_i$ of a zonotope & Lemma~\ref{lem:planar} \\
+$v$ & the vectors $v_i$ of a zonotope with $\sum_i|v_i|\le1$; unit vectors $v_i$ in the proof of the upper bound; the vector $(g(y_j))_j$ of values in the lower bound & Lemma~\ref{lem:planar} \\
 $\mathcal H$ & normalized class $\sum_ic_i\sigma(\omega_i\cdot x)$ with $\sum_i|c_i|\le1$ & Lemma~\ref{lem:Hcover} \\
 $P$, $Q$ & total positive and negative coefficient mass & Lemma~\ref{lem:Hcover} \\
 $\mathbf m$ & linear part $\tfrac12\sum_ic_i\omega_i$ & Lemma~\ref{lem:Hcover} \\
 $\Delta$ & mesh $\eta/32$ of the nets & Lemma~\ref{lem:Hcover} \\
 $\gamma$ & the exponent $(d+2)/(2(d-1))$ & Lemma~\ref{lem:Hcover} \\
 $\varphi$ & a smooth bump supported in the unit ball & Lemma~\ref{lem:bumps} \\
-$\varsigma$ & signs $\varsigma_j$ of the bumps, a sign vector in the lower bound & Lemma~\ref{lem:bumps} \\
+$\varsigma$ & sign vector of a shattering; the signs $\varsigma_j$ of the bumps in Section~\ref{sec:lower} & Section~\ref{sec:intro} \\
 $M$ & a bound on the variation norm & Lemma~\ref{lem:finite} \\
 $K$ & the compact set of neuron value vectors & Lemma~\ref{lem:finite} \\
 $\lambda$ & least scaling with $v\in\lambda\operatorname{conv}K$ & Lemma~\ref{lem:finite} \\
-$\alpha$ & a turning angle; rescaled outer coefficients $\alpha_i$ in the lower bound & Lemma~\ref{lem:planar} \\
+$C'_d$ & the threshold for $R$ in part (b) of the main theorem & Section~\ref{sec:intro} \\
+$C_1$ & a constant in the proof of part (b) of the main theorem & Section~\ref{sec:lower} \\
+$A'_d$ & constant in the proof of Proposition~\ref{prop:bias} & Section~\ref{sec:bias} \\
+$\alpha$ & a turning angle; rescaled outer coefficients $\alpha_i$ in the lower bound; a multi-index in Sections~\ref{sec:lower} and~\ref{sec:bias} & Lemma~\ref{lem:planar} \\
 $Z$, $Z_m$, $\Lambda$, $p$, $q$, $\Gamma$, $\mu$, $\zeta$ & local to one proof & Lemma~\ref{lem:planar} \\
-$N_1$, $N_2$, $N_3$, $\omega$, $t$ & nets, and the parameters of a neuron, local to one proof & Lemma~\ref{lem:Hcover} \\
-$\theta$ & interpolation exponent & Lemma~\ref{lem:bumps} \\
+$N_1$, $N_2$, $N_3$ & nets, local to one proof & Lemma~\ref{lem:Hcover} \\
+$k$ & an index of summation; the power of the ReLU$^k$ dictionary of Mao, Siegel and Xu; an integer Sobolev order in the lower bound & Section~\ref{sec:intro} \\
+$h$ & a combination $\sum_ic_i\sigma(\omega_i\cdot x)$ in the class $\mathcal H$ & Lemma~\ref{lem:Hcover} \\
+$\psi$, $\ell$ & local to one proof & Lemma~\ref{lem:planar} \\
+$N'$, $M'$ & local to one proof & Lemma~\ref{lem:finite} \\
+$\theta$ & an angle in the proof of Lemma~\ref{lem:planar}; the interpolation exponent in Lemma~\ref{lem:bumps} & Lemma~\ref{lem:planar} \\
 \bottomrule
 \end{longtable}}
