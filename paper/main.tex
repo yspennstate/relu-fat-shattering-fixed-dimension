@@ -1,0 +1,276 @@
+\documentclass[11pt]{amsart}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,microtype,amsmath,amssymb,amsthm,mathtools,enumitem,booktabs,longtable}
+\usepackage[margin=1.1in]{geometry}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xurl}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\numberwithin{equation}{section}
+
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\cF}{\mathcal{F}}
+\newcommand{\cP}{\mathbb{P}}
+\newcommand{\fat}{\operatorname{fat}}
+\newcommand{\sgn}{\operatorname{sgn}}
+
+\hypersetup{pdftitle={The fat-shattering dimension of norm-bounded two-layer ReLU networks in fixed dimension},pdfauthor={Yitzchak Shmalo}}
+
+\title[Fat-shattering of two-layer ReLU networks in fixed dimension]{The fat-shattering dimension of norm-bounded two-layer ReLU networks in fixed dimension}
+\author{Yitzchak Shmalo}
+\address{Einstein Institute of Mathematics, The Hebrew University of Jerusalem, Jerusalem, Israel}
+\email{yitzchak.shmalo@gmail.com}
+\date{November 2026}
+\subjclass[2020]{68Q32, 41A46, 68T07, 52A21}
+\keywords{fat-shattering dimension, sample complexity, ReLU networks, variation spaces, zonoids}
+
+\begin{document}
+\begin{abstract}
+Consider the functions $x\mapsto u^{T}\sigma(Wx)$ on the ball of radius $b_x$ in $\RR^d$, where $\sigma$ is the ReLU function, $W$ has $n$ rows, $\|W\|_F\le B$ and $|u|\le b$, and put $R=bBb_x/\varepsilon$. For every width and dimension the fat-shattering dimension of this class at scale $\varepsilon$ is at most $R^2$ up to logarithmic factors, and Vardi, Shamir and Srebro asked whether a better bound holds when $d$ is small. We prove that for fixed $d\ge2$ the exponent of $R$ is $2(d-1)/(d+2)$: the fat-shattering dimension is at most a constant times $R^{2(d-1)/(d+2)}\log(2+R)$ for every width, and at least a constant times $R^{2(d-1)/(d+2)}$ when the width is at least that large. The upper bound writes the networks through support functions of zonoids, as Bach did, and uses the approximation of zonoids by zonotopes due to Matou\v{s}ek and Siegel. The lower bound restricts the networks to an affine hyperplane and uses the embedding of Sobolev spaces into the ReLU variation space due to Mao, Siegel and Xu.
+\end{abstract}
+\maketitle
+
+\section{Introduction}\label{sec:intro}
+
+Fix $d\ge2$, a width $n\ge1$ and constants $b,B,b_x>0$. Let $\sigma(z)=\max\{z,0\}$, applied coordinatewise, let $X=\{x\in\RR^d:|x|\le b_x\}$, and let
+\[
+\cF_n=\bigl\{x\mapsto u^{T}\sigma(Wx)\;:\;u\in\RR^n,\ W\in\RR^{n\times d},\ |u|\le b,\ \|W\|_F\le B\bigr\},
+\]
+a class of functions on $X$; here $|\cdot|$ is the Euclidean norm and $\|\cdot\|_F$ the Frobenius norm. The sample complexity of learning with such a class is governed by its fat-shattering dimension, introduced by Kearns and Schapire~\cite{KS}; its role in learning was established by Alon, Ben-David, Cesa-Bianchi and Haussler~\cite{ABCH} and by Bartlett~\cite{Bartlett98}.
+
+\begin{definition}
+Let $\cF$ be a class of real functions on a set $X$ and $\varepsilon>0$. Points $x_1,\dots,x_N\in X$ are \emph{$\varepsilon$-shattered} by $\cF$ if there are $r_1,\dots,r_N\in\RR$, the levels, such that for every $s\in\{-1,1\}^N$ some $f\in\cF$ satisfies $s_j(f(x_j)-r_j)\ge\varepsilon$ for $j=1,\dots,N$. The fat-shattering dimension $\fat_\varepsilon(\cF)$ is the largest such $N$, or $+\infty$ if there is no largest one.
+\end{definition}
+
+Write $R=bBb_x/\varepsilon$. For every width $n$ and every dimension $d$, $\fat_\varepsilon(\cF_n)$ is at most a constant times $R^2$ up to logarithmic factors. This follows from the Rademacher bounds of Neyshabur, Tomioka and Srebro~\cite{NTS} and of Golowich, Rakhlin and Shamir~\cite{GRS} for the ReLU function, which Vardi, Shamir and Srebro~\cite[Theorem~2]{VSS} extend to Lipschitz activations. Bartlett, Foster and Telgarsky~\cite{BFT} gave bounds of this kind for deep networks in terms of spectral norms. Vardi, Shamir and Srebro also prove lower bounds that grow linearly in $R$ when $d$ is large~\cite[Theorem~3 and Corollary~1]{VSS}, and they leave open whether a bound of smaller order than $R^2$ holds when $d$ is fixed~\cite[Section~3.2]{VSS}. Two entropy bounds give a smaller exponent for the larger class of networks with biases and path norm $\sum_i|u_i||w_i|\le bB$, which contains $\cF_n$. Liu, Dadi and Cevher~\cite[Proposition~5]{LDC} obtain the exponent $2d/(d+2)$ for $d>5$, and the uniform approximation theorem of Siegel~\cite[Theorem~2]{Siegel} gives $2d/(d+3)$ for every $d\ge2$ (Proposition~\ref{prop:bias} below). These bounds do not use that the neurons of $\cF_n$ have no bias, and they come with no matching lower bound for $\cF_n$: the lower bound of~\cite[Corollary~1]{VSS} for the ReLU function asks that $d$ exceed a factor polylogarithmic in the problem parameters, and the Sobolev embeddings that give lower bounds for the variation space produce functions, not networks with $|u|\le b$ and $\|W\|_F\le B$. Theorem~\ref{thm:main} shows that the exponent of $\cF_n$ is $2(d-1)/(d+2)$, which is $2e/(e+3)$ with $e=d-1$, the exponent of networks with biases in one dimension less. The upper bound combines known approximation theorems; the lower bound is new.
+
+\begin{theorem}\label{thm:main}
+For every $d\ge2$ there are constants $c_d,C_d,C'_d>0$, depending only on $d$, such that the following hold for all $n\ge1$ and $b,B,b_x,\varepsilon>0$, with $R=bBb_x/\varepsilon$.
+\begin{enumerate}[label=(\alph*)]
+\item If $R<1$ then $\fat_\varepsilon(\cF_n)=0$, and for all $R$,
+\[
+\fat_\varepsilon(\cF_n)\le C_d\,R^{2(d-1)/(d+2)}\log(2+R).
+\]
+\item If $R\ge C'_d$ then
+\[
+\fat_\varepsilon(\cF_n)\ge\min\bigl\{n,\ \lfloor c_d\,R^{2(d-1)/(d+2)}\rfloor\bigr\}.
+\]
+\end{enumerate}
+\end{theorem}
+
+The exponent $2(d-1)/(d+2)$ equals $1/2$ for $d=2$ and $1$ for $d=4$, and it increases to $2$, the exponent of the dimension-free bound, as $d\to\infty$. For width at least $c_dR^{2(d-1)/(d+2)}$ the two bounds agree up to the logarithm. Let $\cF_n^{\mathrm{sp}}$ be the class defined as $\cF_n$ but with the spectral norm $\|W\|\le B$ in place of $\|W\|_F\le B$. Vardi, Shamir and Srebro~\cite[Theorem~1]{VSS} proved that under spectral-norm control the fat-shattering dimension grows with the width once $d$ is at least a polynomial in $n$, $R$ and the other parameters; the following corollary, proved at the end of Section~\ref{sec:upper}, shows that for fixed $d$ it does not.
+
+\begin{corollary}\label{cor:spectral}
+Theorem~\ref{thm:main} holds for $\cF_n^{\mathrm{sp}}$, with $C_d$ replaced by a larger constant depending only on $d$.
+\end{corollary}
+
+By positive homogeneity every $f\in\cF_n$ is a combination $\sum_ic_i\sigma(\omega_i\cdot x)$ of unit-norm neurons with $\sum_i|c_i|\le bB$. Since $\sigma(z)=(|z|+z)/2$, $f$ is, up to a linear function, a difference of two support functions of zonoids in $\RR^d$ with total mass at most $bB$; this connection between ReLU networks and zonoids is due to Bach~\cite{Bach}. Zonoids in $\RR^d$ are approximated by zonotopes with $m$ summands with error of order $m^{-1/2-3/(2(d-1))}$ in the uniform norm on the sphere. For $d\ge5$ this is due to Matou\v{s}ek~\cite{Matousek}, and for $d=3,4$, where Matou\v{s}ek's bound carries a factor $\sqrt{\log m}$, to Siegel~\cite[Theorem~1]{Siegel}; the rate is optimal by Bourgain, Lindenstrauss and Milman~\cite{BLM}. For $d=2$ it is the classical approximation of a planar symmetric convex body by polygons (McClure and Vitale~\cite{MV}; Lemma~\ref{lem:planar}). This is the rate of networks with biases in dimension $d-1$. It gives a uniform cover of $\cF_n$ whose logarithm is of order $R^{2(d-1)/(d+2)}\log R$, and a uniform cover at scale below $\varepsilon$ bounds $\fat_\varepsilon$ by the logarithm of its size.
+
+The lower bound uses points on the affine hyperplane $\{x_d=b_x/\sqrt2\}$. There $\sigma(w\cdot x)$ restricts to a neuron with a bias in dimension $d-1$, so on these points $\cF_n$ contains the networks with biases in dimension $d-1$ whose variation norm, in the sense of Bach~\cite{Bach} and Siegel and Xu~\cite{SX} (Section~\ref{sec:prelim}), is at most of order $bBb_x$. Mao, Siegel and Xu~\cite{MSX} proved that the Sobolev space of order $s=(e+3)/2$ on the unit ball of $\RR^{e}$ embeds into the variation space of ReLU networks with biases. A sum of $N$ bumps of height $2\varepsilon$ and width $\delta$, with arbitrary signs, has Sobolev norm of order $\varepsilon\delta^{-s}$, so its variation norm is below $bBb_x$ once $\delta$ is of order $R^{-1/s}$, and the bumps then number of order $R^{(d-1)/s}=R^{2(d-1)/(d+2)}$. A Carath\'eodory argument (Lemma~\ref{lem:finite}) represents the values at the $N$ points by a network of width at most $N$ with $|u|\le b$ and $\|W\|_F\le B$.
+
+For networks with a common bias, $\cF^{\beta}_n=\{x\mapsto u^{T}\sigma(Wx-\beta\mathbf 1)\}$ with $\beta\ge0$ and the same constraints on $u$ and $W$, the neurons no longer reduce to zonoids, and the approximation theorem of Siegel for ReLU networks with biases~\cite[Theorem~2]{Siegel} gives the following bound, proved in Section~\ref{sec:bias}.
+
+\begin{proposition}\label{prop:bias}
+For every $d\ge2$ there is $C_d$ such that for all $\beta\ge0$, $n\ge1$ and $b,B,b_x,\varepsilon>0$, $\fat_\varepsilon(\cF_n^{\beta})=0$ if $R<1$ and $\fat_\varepsilon(\cF_n^{\beta})\le C_dR^{2d/(d+3)}\log(2+R)$ for all $R$.
+\end{proposition}
+
+The exponent $2d/(d+3)$ is larger than $2(d-1)/(d+2)$. The construction of Section~\ref{sec:lower} does not transfer to $\cF_n^{\beta}$ when $\beta>0$: a neuron $\sigma(w\cdot x-\beta)$ that is not zero on $X$ has $|w|>\beta/b_x$, so a network with $N$ such neurons has $\|W\|_F^2>N\beta^2/b_x^2$. The exact exponent for $\cF_n^{\beta}$ is open.
+
+The metric entropy of the variation space has been studied in $L_2$ and in the uniform norm. Siegel and Xu~\cite{SX} determined the $L_2$ metric entropy of the unit ball of the ReLU variation space on the unit ball of $\RR^d$, of order $\eta^{-2d/(d+3)}$, and Siegel~\cite{Siegel} obtained the same order in the uniform norm; earlier uniform rates are due to Makovoz~\cite{Makovoz} and Bach~\cite{Bach}. Parhi and Nowak~\cite{PN} used such entropy bounds to obtain near-minimax rates for estimation with shallow ReLU networks, and Liang, Qiao, Wang and Parhi~\cite{LQWP} constructed packings of shallow ReLU networks that concentrate near the boundary of the domain to prove lower bounds for flat minima.
+
+\section{Preliminaries}\label{sec:prelim}
+
+For $e\ge1$ let $B^e$ be the closed unit ball of $\RR^e$ and $S^{e-1}$ its boundary sphere, with $S^0=\{-1,1\}$. Following~\cite{SX,MSX}, let
+\[
+\cP^e=\{\sigma(\omega\cdot y+t)\;:\;\omega\in S^{e-1},\ t\in[-1,1]\},
+\]
+regarded as a set of functions on $B^e$. Let $B_1(\cP^e)$ be the closure in $L_2(B^e)$ of the set of finite combinations $\sum_ia_ig_i$ with $g_i\in\cP^e$ and $\sum_i|a_i|\le1$, and for $g\in L_2(B^e)$ let $\|g\|_{\mathcal K_1(\cP^e)}=\inf\{c>0:g\in cB_1(\cP^e)\}$, the variation norm of $g$; the variation space $\mathcal K_1(\cP^e)$ is the set of $g$ for which it is finite. Every element of $\cP^e$ is $1$-Lipschitz on $B^e$ and bounded by $2$ in absolute value. For $s\ge0$ and $g\in L_2(\RR^e)$ with Fourier transform $\hat g$ let
+\[
+\|g\|_{H^s}^2=\int_{\RR^e}(1+|\xi|)^{2s}|\hat g(\xi)|^2\,d\xi .
+\]
+This norm is equivalent to the norm of the space denoted $W^s(L_2(\RR^e))$ in~\cite{MSX}. The next two facts are standard; the reduction in Lemma~\ref{lem:reduce} goes back to Neyshabur, Tomioka and Srebro~\cite{NTS}.
+
+\begin{lemma}\label{lem:cover}
+Let $\cF$ be a class of real functions on a set $X$, let $\varepsilon>0$, and let $G$ be a finite set of real functions on $X$ such that for every $f\in\cF$ there is $g\in G$ with $\sup_X|f-g|<\varepsilon$. Then $\fat_\varepsilon(\cF)\le\log_2|G|$.
+\end{lemma}
+
+\begin{proof}
+Let $x_1,\dots,x_N$ be $\varepsilon$-shattered with levels $r_1,\dots,r_N$. For $s\in\{-1,1\}^N$ choose $f_s\in\cF$ with $s_j(f_s(x_j)-r_j)\ge\varepsilon$ for all $j$, and $g_s\in G$ with $\sup_X|f_s-g_s|<\varepsilon$. Then $s_j(g_s(x_j)-r_j)>0$ for all $j$, so $s$ is the vector of signs of $(g_s(x_j)-r_j)_j$, and $s\mapsto g_s$ is injective. Hence $2^N\le|G|$.
+\end{proof}
+
+\begin{lemma}\label{lem:reduce}
+Every $f\in\cF_n$ can be written as $f(x)=\sum_{i=1}^{n}c_i\sigma(\omega_i\cdot x)$ with $\omega_i\in S^{d-1}$ and $\sum_i|c_i|\le bB$. In particular $|f(x)|\le bB|x|$, and $\fat_\varepsilon(\cF_n)=0$ when $R<1$.
+\end{lemma}
+
+\begin{proof}
+Let $f(x)=\sum_iu_i\sigma(w_i\cdot x)$, where $w_i$ is the $i$th row of $W$. Rows with $w_i=0$ contribute nothing; for the others put $\omega_i=w_i/|w_i|$ and $c_i=u_i|w_i|$, so that $u_i\sigma(w_i\cdot x)=c_i\sigma(\omega_i\cdot x)$ by positive homogeneity. By the Cauchy--Schwarz inequality $\sum_i|c_i|\le|u|\,\|W\|_F\le bB$, and $|\sigma(\omega_i\cdot x)|\le|x|$. If a single point $x\in X$ is $\varepsilon$-shattered with level $r$, there are $f_+,f_-\in\cF_n$ with $f_+(x)\ge r+\varepsilon$ and $f_-(x)\le r-\varepsilon$, so $2\varepsilon\le2bBb_x$, that is $R\ge1$.
+\end{proof}
+
+\section{The upper bound}\label{sec:upper}
+
+For a finite positive measure $\tau$ on $S^{d-1}$ let $h_\tau(x)=\int_{S^{d-1}}|x\cdot y|\,d\tau(y)$; this is the support function of a zonoid, and every zonoid centred at the origin arises in this way. A measure with $m$ atoms gives the support function of a zonotope with $m$ summands, and the approximation of $h_\tau$ by such measures is the following statement. For $d\ge5$ it is due to Matou\v{s}ek~\cite{Matousek}, for $d=3,4$ to Siegel~\cite[Theorem~1]{Siegel}, and for $d=2$ it is classical~\cite{MV}; we include a proof for $d=2$ with explicit constants.
+
+\begin{lemma}\label{lem:zonoid}
+For every $d\ge2$ there is $A_d$ such that for every probability measure $\tau$ on $S^{d-1}$ and every $m\ge1$ there is a positive measure $\tau'$ on $S^{d-1}$ with at most $m$ atoms and total mass at most $1$ such that
+\[
+\sup_{x\in S^{d-1}}|h_\tau(x)-h_{\tau'}(x)|\le A_d\,m^{-(d+2)/(2(d-1))}.
+\]
+\end{lemma}
+
+\begin{proof}
+For $d\ge3$ this is~\cite[Theorem~1]{Siegel}, which for $d\ge5$ recovers the bound of~\cite{Matousek}, stated there for the sphere $S^{e}\subset\RR^{e+1}$ with the exponent $1/2+3/(2e)$; with $e=d-1\ge2$ the exponent is $(d+2)/(2(d-1))$, and the measure provided there is a probability measure. For $d=2$ the exponent is $2$, and the statement is Lemma~\ref{lem:planar} below.
+\end{proof}
+
+\begin{lemma}\label{lem:planar}
+Let $\tau$ be a probability measure on $S^{1}$ and $m\ge1$. There are $v_1,\dots,v_m\in\RR^2$ with $\sum_i|v_i|\le1$ and $\sup_{x\in S^1}|h_\tau(x)-\sum_{i=1}^m|x\cdot v_i||\le40\,m^{-2}$.
+\end{lemma}
+
+\begin{proof}
+The function $h=h_\tau$ is even, positively homogeneous and subadditive, so it is the support function of a compact convex set $Z\subset\RR^2$ symmetric about the origin, and $h(x)\le|x|$ gives $Z\subset B^2$. If $Z$ is a segment $[-v,v]$ then $h(x)=|x\cdot v|$ and $|v|\le1$, so assume that $Z$ has nonempty interior. Let $\Lambda$ denote the perimeter of $Z$. By Cauchy's formula $\Lambda=\int_0^{2\pi}h(\cos\theta,\sin\theta)\,d\theta$, and since $\int_0^{2\pi}|\cos(\theta-\psi)|\,d\theta=4$ for every $\psi$, $\Lambda=4\tau(S^1)=4$. Since $0\le h\le1$ on $S^1$, the choice $v_1=\dots=v_m=0$ proves the bound for $m\le4$, so let $m\ge5$.
+
+Fix $p_0\in\partial Z$ and let $\Gamma$ be the arc of $\partial Z$ from $p_0$ to $-p_0$ in the counterclockwise direction. Along $\Gamma$ the arc length increases by $\Lambda/2=2$ and the direction of the tangent turns by $\pi$ in total, counting the turns at corners. Let $\mu$ be the sum of the arc-length measure on $\Gamma$ and the measure of turning (the distributional derivative of the angle of the right tangent), a measure of total mass at most $2\pi$. Taking quantiles of $\mu$, choose points $p_0,p_1,\dots,p_m=-p_0$ in order along $\Gamma$, not necessarily distinct, such that $\mu$ gives mass at most $2\pi/m$ to every open arc $(p_{k-1},p_k)$. Put $p_{m+k}=-p_k$ and let $Z_m$ be the convex hull of $p_0,\dots,p_{2m-1}$, a polygon symmetric about the origin with $Z_m\subset Z$.
+
+Consider an open arc between consecutive points $p=p_{k-1}$ and $p'=p_k$, of length $\ell\le2\pi/m$, along which the tangent turns by $\alpha\le2\pi/m<\pi/2$. The unit tangents along the arc lie in an angular interval of length $\alpha$, and the vectors $q-p$ and $p'-p$, for $q$ on the arc, are integrals of these tangents, so the angle between them is at most $\alpha$ and both make an acute angle with $p'-p$; similarly for $p'-q$. Hence the orthogonal projection of $q$ onto the line through $p$ and $p'$ lies on the segment $[p,p']$, and the distance from $q$ to that segment is at most $|q-p|\sin\alpha\le\ell\alpha\le4\pi^2m^{-2}$. Every point of $\partial Z$ is therefore within $4\pi^2m^{-2}$ of $Z_m$, and since $Z_m\subset Z$ we get $0\le h-h_{Z_m}\le4\pi^2m^{-2}<40\,m^{-2}$ on $S^1$, where $h_{Z_m}$ is the support function of $Z_m$.
+
+A convex polygon symmetric about the origin has edge vectors $\zeta_1,\dots,\zeta_{m'},-\zeta_1,\dots,-\zeta_{m'}$ in cyclic order, with $m'\le m$ here, and it is the Minkowski sum of the segments $[-\zeta_i/2,\zeta_i/2]$. Hence $h_{Z_m}(x)=\sum_{i\le m'}|x\cdot\zeta_i|/2$. Put $v_i=\zeta_i/2$ for $i\le m'$ and $v_i=0$ otherwise. Then $\sum_i|v_i|$ is a quarter of the perimeter of $Z_m$, which is at most $\Lambda$, so $\sum_i|v_i|\le\Lambda/4=1$.
+\end{proof}
+
+\begin{lemma}\label{lem:Hcover}
+For every $d\ge2$ there is $C_d$ such that the following holds. Let $\mathcal H$ be the set of functions on $B^d$ of the form $h(x)=\sum_ic_i\sigma(\omega_i\cdot x)$, a finite sum with $\omega_i\in S^{d-1}$ and $\sum_i|c_i|\le1$. For every $\eta\in(0,1]$ there is a finite set $G$ of functions on $B^d$ with $\log|G|\le C_d\,\eta^{-2(d-1)/(d+2)}\log(2/\eta)$ such that every $h\in\mathcal H$ satisfies $\sup_{B^d}|h-g|\le\eta$ for some $g\in G$.
+\end{lemma}
+
+\begin{proof}
+Write $\gamma=(d+2)/(2(d-1))$. Let $h\in\mathcal H$. Since $\sigma(z)=(|z|+z)/2$,
+\[
+h(x)=\tfrac12\bigl(P\,h_{\tau_+}(x)-Q\,h_{\tau_-}(x)\bigr)+\mathbf m\cdot x,\qquad \mathbf m=\tfrac12\sum_ic_i\omega_i,
+\]
+where $P=\sum_{c_i>0}c_i$, $Q=\sum_{c_i<0}|c_i|$, $P+Q\le1$, $|\mathbf m|\le1/2$, and $\tau_\pm$ are probability measures on $S^{d-1}$ (if $P=0$ or $Q=0$ the corresponding term is absent). Let $m$ be the least integer with $A_dm^{-\gamma}\le\eta/2$. By Lemma~\ref{lem:zonoid} there are positive measures $\tau'_\pm$ with at most $m$ atoms and mass at most $1$ such that $|h_{\tau_\pm}-h_{\tau'_\pm}|\le\eta/2$ on $S^{d-1}$, and by homogeneity $|h_{\tau_\pm}(x)-h_{\tau'_\pm}(x)|\le\eta|x|/2$ on $B^d$. Hence
+\[
+\Bigl|h(x)-\sum_{i=1}^{2m}a_i|v_i\cdot x|-\mathbf m\cdot x\Bigr|\le\frac\eta4\qquad(x\in B^d)
+\]
+for some $v_i\in S^{d-1}$ and $a_i\in\RR$ with $\sum_i|a_i|\le1$.
+
+Let $\Delta=\eta/32$. Let $N_1$ be a $\Delta$-net of $S^{d-1}$ and $N_2$ a $\Delta$-net of the ball of radius $1/2$ in $\RR^d$, each of cardinality at most $(3/\Delta)^d$, and let $N_3=(\Delta/(4m))\mathbb Z\cap[-2,2]$. Let $G$ be the set of functions $x\mapsto\sum_{i=1}^{2m}a'_i|v'_i\cdot x|+\mathbf m'\cdot x$ on $B^d$ with $a'_i\in N_3$, $v'_i\in N_1$ and $\mathbf m'\in N_2$. Replacing $v_i$, $a_i$ and $\mathbf m$ by nearest points of the nets changes the function on $B^d$ by at most $\sum_i|a_i|\Delta+2m\cdot\Delta/(8m)+\Delta\le4\Delta$, since $||v\cdot x|-|v'\cdot x||\le|v-v'|$ and $|v'\cdot x|\le1$ for $|x|\le1$. As $4\Delta<\eta/4$, every $h\in\mathcal H$ is within $\eta/2$ of an element of $G$. Finally
+\[
+\log|G|\le2m\bigl(d\log(3/\Delta)+\log(16m/\Delta+1)\bigr)+d\log(3/\Delta),
+\]
+and $m\le(2A_d/\eta)^{1/\gamma}+1$ with $1/\gamma=2(d-1)/(d+2)$, which gives the stated bound since $\log m$ and $\log(1/\Delta)$ are at most constants times $\log(2/\eta)$.
+\end{proof}
+
+\begin{proof}[Proof of Theorem~\ref{thm:main}(a)]
+The case $R<1$ is Lemma~\ref{lem:reduce}. Let $R\ge1$ and $f\in\cF_n$. By Lemma~\ref{lem:reduce}, $h(y)=f(b_xy)/(bBb_x)$ belongs to $\mathcal H$. Let $\eta=1/(2R)\le1/2$ and let $G$ be the set of Lemma~\ref{lem:Hcover}. For $g\in G$ with $\sup_{B^d}|h-g|\le\eta$, the function $x\mapsto bBb_x\,g(x/b_x)$ is within $bBb_x\eta=\varepsilon/2<\varepsilon$ of $f$ on $X$. Lemma~\ref{lem:cover} applied to these rescaled functions gives
+\[
+\fat_\varepsilon(\cF_n)\le\log_2|G|\le C_d(2R)^{2(d-1)/(d+2)}\log(4R)/\log2,
+\]
+which is at most a constant depending on $d$ times $R^{2(d-1)/(d+2)}\log(2+R)$.
+\end{proof}
+
+\begin{proof}[Proof of Corollary~\ref{cor:spectral}]
+Since $\|W\|\le\|W\|_F$ and $\|W\|_F\le\sqrt d\,\|W\|$ for $W\in\RR^{n\times d}$, the class $\cF_n$ is contained in $\cF_n^{\mathrm{sp}}$, and $\cF_n^{\mathrm{sp}}$ is contained in the class $\cF_n$ defined with $\sqrt d\,B$ in place of $B$. The lower bound for $\cF_n$ therefore holds for $\cF_n^{\mathrm{sp}}$. For $R\ge1$ the upper bound for $\cF_n^{\mathrm{sp}}$ follows from part~(a) applied with $\sqrt d\,R$ in place of $R$. For $R<1$, if $\|W\|\le B$ and $|u|\le b$ then $|u^{T}\sigma(Wx)|\le|u|\,|Wx|\le bB|x|$, and the last argument in the proof of Lemma~\ref{lem:reduce} gives $\fat_\varepsilon(\cF_n^{\mathrm{sp}})=0$.
+\end{proof}
+
+\section{The lower bound}\label{sec:lower}
+
+Throughout this section $e=d-1\ge1$ and $s=(e+3)/2=(d+2)/2$.
+
+\begin{lemma}[Mao, Siegel and Xu~\cite{MSX}]\label{lem:embed}
+There is $C_e$ such that $\|g|_{B^e}\|_{\mathcal K_1(\cP^e)}\le C_e\|g\|_{H^s}$ for every $g\in C_c^\infty(\RR^e)$.
+\end{lemma}
+
+\begin{proof}
+By~\cite[Theorem~1]{MSX} with $k=1$, the space $W^s(L_2(B^e))$ embeds continuously into $\mathcal K_1(\cP^e)$; in~\cite{MSX} the norm of $W^s(L_2(B^e))$ is defined as the infimum of the norms in $W^s(L_2(\RR^e))$ of the extensions, and the latter norm is bounded by a constant times $\|g\|_{H^s}$.
+\end{proof}
+
+\begin{lemma}\label{lem:bumps}
+Let $\varphi\in C_c^\infty(\RR^e)$ be supported in the open unit ball. There is $C_{e,\varphi}$ such that for $\delta\in(0,1]$, points $y_1,\dots,y_N\in\RR^e$ with $|y_j-y_l|\ge2\delta$ for $j\ne l$ and $N\delta^e\le1$, and signs $\varsigma_j\in\{-1,1\}$, the function $g=\sum_j\varsigma_j\varphi((\cdot-y_j)/\delta)$ satisfies $\|g\|_{H^s}\le C_{e,\varphi}\delta^{-s}$.
+\end{lemma}
+
+\begin{proof}
+The supports of the summands are disjoint. For an integer $k\ge0$ we have $(1+|\xi|)^{2k}\le C\sum_{|\alpha|\le k}|\xi^\alpha|^2$ with $C$ depending on $e$ and $k$, so by Plancherel's theorem $\|g\|_{H^k}^2$ is at most a constant times $\sum_{|\alpha|\le k}\|\partial^\alpha g\|_{L_2}^2$. By disjointness and scaling, $\|\partial^\alpha g\|_{L_2}^2=N\delta^{e-2|\alpha|}\|\partial^\alpha\varphi\|_{L_2}^2\le\delta^{-2k}\|\partial^\alpha\varphi\|_{L_2}^2$ for $|\alpha|\le k$. Hence $\|g\|_{H^k}\le C\delta^{-k}$. If $s=k+\theta$ with $\theta\in(0,1)$, H\"older's inequality gives $\|g\|_{H^s}\le\|g\|_{H^k}^{1-\theta}\|g\|_{H^{k+1}}^{\theta}\le C\delta^{-s}$.
+\end{proof}
+
+\begin{lemma}\label{lem:finite}
+Let $g$ be a continuous function on $B^e$ with $\|g\|_{\mathcal K_1(\cP^e)}\le M$, and let $y_1,\dots,y_N\in B^e$. There are $N'\le N$ elements $\sigma(\omega_i\cdot y+t_i)$ of $\cP^e$ and coefficients $a_i$ with $\sum_i|a_i|\le M$ such that $g(y_j)=\sum_{i=1}^{N'}a_i\sigma(\omega_i\cdot y_j+t_i)$ for $j=1,\dots,N$.
+\end{lemma}
+
+\begin{proof}
+Let $K\subset\RR^N$ be the set of vectors $(\sigma(\omega\cdot y_j+t))_{j\le N}$ and $-(\sigma(\omega\cdot y_j+t))_{j\le N}$ with $\omega\in S^{e-1}$ and $t\in[-1,1]$. It is compact, so its convex hull $\operatorname{conv}K$ is compact. If $M=0$ then $g=0$ in $L_2(B^e)$, hence everywhere, and there is nothing to prove; let $M>0$. By the definition of the norm, $g\in M'B_1(\cP^e)$ for every $M'>M$, so there are finite combinations $g_k$ with coefficient sums at most $M'$ and $g_k\to g$ in $L_2(B^e)$. The $g_k$ are $M'$-Lipschitz and bounded by $2M'$, so by the Arzel\`a--Ascoli theorem a subsequence converges uniformly on $B^e$ to a continuous function, which equals $g$ almost everywhere and therefore everywhere on $B^e$. Hence $v=(g(y_j))_j$ is a limit of points of $M'\operatorname{conv}K$, so $v\in M'\operatorname{conv}K$ for every $M'>M$, and by compactness $v\in M\operatorname{conv}K$. If $v=0$ take $N'=0$. Otherwise let $\lambda\in(0,M]$ be the least number with $v\in\lambda\operatorname{conv}K$; then $v/\lambda$ lies on the boundary of $\operatorname{conv}K$, in a face of dimension at most $N-1$, and by Carath\'eodory's theorem it is a convex combination of at most $N$ points of $K$. Multiplying by $\lambda$ gives the claim.
+\end{proof}
+
+\begin{proof}[Proof of Theorem~\ref{thm:main}(b)]
+Fix $\varphi\in C_c^\infty(\RR^e)$ supported in the open unit ball with $\varphi(0)=1$, and let $C_1=C_eC_{e,\varphi}$ with the constants of Lemmas~\ref{lem:embed} and~\ref{lem:bumps}. Put $\delta=(4C_1/R)^{1/s}$ and $C'_d=8^s\cdot4C_1$, so that $\delta\le1/8$ when $R\ge C'_d$. The points of the lattice $2\delta\mathbb Z^e$ in the ball of radius $1/2$ number at least $c\,\delta^{-e}$ for a constant $c=c(e)>0$, they are at distance at least $2\delta$ from each other, and since the balls of radius $\delta$ around them are disjoint and lie in $B^e$, any $N$ of them satisfy $N\delta^e\le1$. Let $c_d=c\,(4C_1)^{-e/s}$ and $N=\min\{n,\lfloor c_dR^{e/s}\rfloor\}$, choose $N$ of these points $y_1,\dots,y_N$, and note $e/s=2(d-1)/(d+2)$. Put
+\[
+x_j=\frac{b_x}{\sqrt2}(y_j,1)\in\RR^d,\qquad j=1,\dots,N,
+\]
+so that $|x_j|\le b_x$. We show that $x_1,\dots,x_N$ are $\varepsilon$-shattered by $\cF_n$ with all levels $r_j=0$.
+
+Let $\varsigma\in\{-1,1\}^N$ and $g=2\varepsilon\sum_j\varsigma_j\varphi((\cdot-y_j)/\delta)$. Then $g(y_j)=2\varepsilon\varsigma_j$, since the supports are disjoint and $\varphi(0)=1$. By Lemmas~\ref{lem:embed} and~\ref{lem:bumps}, $\|g|_{B^e}\|_{\mathcal K_1(\cP^e)}\le2\varepsilon C_1\delta^{-s}=\varepsilon R/2=bBb_x/2$. Lemma~\ref{lem:finite} gives $N'\le N\le n$ elements $\sigma(\omega_i\cdot y+t_i)$ of $\cP^e$ and coefficients $a_i$ with $\sum_i|a_i|\le bBb_x/2$ and $\sum_ia_i\sigma(\omega_i\cdot y_j+t_i)=2\varepsilon\varsigma_j$ for every $j$.
+
+For each $i$ let $w_i=(\omega_i,t_i)/\sqrt{1+t_i^2}\in S^{d-1}$. Then $w_i\cdot x_j=b_x(\omega_i\cdot y_j+t_i)/\sqrt{2(1+t_i^2)}$, so by positive homogeneity
+\[
+\sigma(\omega_i\cdot y_j+t_i)=\frac{\sqrt{2(1+t_i^2)}}{b_x}\,\sigma(w_i\cdot x_j).
+\]
+Put $\alpha_i=a_i\sqrt{2(1+t_i^2)}/b_x$, so that $\sum_i\alpha_i\sigma(w_i\cdot x_j)=2\varepsilon\varsigma_j$ and $\sum_i|\alpha_i|\le2\sum_i|a_i|/b_x\le bB$. Define $u\in\RR^n$ and $W\in\RR^{n\times d}$ by $u_i=\sgn(\alpha_i)\sqrt{|\alpha_i|b/B}$ and $i$th row $\sqrt{|\alpha_i|B/b}\,w_i$ for $i\le N'$, and $u_i=0$ with zero rows for $i>N'$. Then $|u|^2=(b/B)\sum_i|\alpha_i|\le b^2$, $\|W\|_F^2=(B/b)\sum_i|\alpha_i|\le B^2$, and $u_i\sigma(\sqrt{|\alpha_i|B/b}\,w_i\cdot x)=\alpha_i\sigma(w_i\cdot x)$. The function $f(x)=u^{T}\sigma(Wx)$ therefore lies in $\cF_n$ and satisfies $\varsigma_jf(x_j)=2\varepsilon\ge\varepsilon$ for every $j$.
+\end{proof}
+
+\section{A common bias}\label{sec:bias}
+
+We prove Proposition~\ref{prop:bias} with the discretization of Section~\ref{sec:upper}.
+
+\begin{proof}[Proof of Proposition~\ref{prop:bias}]
+Let $f(x)=\sum_iu_i\sigma(w_i\cdot x-\beta)$ be in $\cF^\beta_n$. Since $0\le\sigma(z-\beta)\le|z|$, the argument of Lemma~\ref{lem:reduce} gives $|f|\le bBb_x$ on $X$ and $\fat_\varepsilon(\cF_n^\beta)=0$ when $R<1$. A neuron with $|w_i|\le\beta/b_x$ vanishes on $X$. For the others put $\omega_i=w_i/|w_i|$ and $t_i=-\beta/(|w_i|b_x)\in(-1,0]$; then for $y\in B^d$,
+\[
+u_i\sigma(w_i\cdot b_xy-\beta)=u_i|w_i|b_x\,\sigma(\omega_i\cdot y+t_i),
+\]
+so $f(b_xy)/(bBb_x)=\sum_ic_i\sigma(\omega_i\cdot y+t_i)$ with $\sum_i|c_i|\le1$ by the Cauchy--Schwarz inequality. Splitting the sum by the sign of $c_i$ writes this function as $P\int\sigma(\omega\cdot y+t)\,d\tau_+-Q\int\sigma(\omega\cdot y+t)\,d\tau_-$ with probability measures $\tau_\pm$ on $S^{d-1}\times[-1,1]$ and $P+Q\le1$. By~\cite[Theorem~2]{Siegel} with $k=1$ and $\alpha=0$ in its notation, each $\tau_\pm$ can be replaced by a probability measure with at most $m$ atoms at a uniform cost on $B^d$ of at most $A'_dm^{-1/2-3/(2d)}$. The functions $\sigma(\omega\cdot y+t)$ on $B^d$ satisfy $|\sigma(\omega\cdot y+t)-\sigma(\omega'\cdot y+t')|\le|\omega-\omega'|+|t-t'|$, so the discretization in the proof of Lemma~\ref{lem:Hcover}, with a net of $S^{d-1}\times[-1,1]$ in place of $N_1$ and no linear term, gives a uniform $\eta$-cover of the rescaled class with logarithm at most $C_d\eta^{-2d/(d+3)}\log(2/\eta)$. Lemma~\ref{lem:cover} with $\eta=1/(2R)$ completes the proof as in Section~\ref{sec:upper}.
+\end{proof}
+
+\section*{Acknowledgements and funding}
+This work was done by multiple AI agents, Claude (Anthropic) and Codex (OpenAI), connected to Math Brain~\cite{MathBrainRepo} and working together inside the Brain framework~\cite{BrainFramework}, a shared, persistent memory in which the agents record claims, proofs, failed attempts and methods, retrieve one another's results, coordinate who works on what, and audit each other's work. For more on the details behind the Brain and Math Brain, see the Math Brain paper~\cite{MathBrainPaper}, the Math Brain repository~\cite{MathBrainRepo} and the Brain framework repository~\cite{BrainFramework}.
+
+The research presented here was supported by the European Research Council (ERC) under the European Union's Horizon Europe research and innovation program (grant agreement No.~101041711) and by the Simons Foundation as part of the Collaboration on the Mathematical and Scientific Foundations of Deep Learning. It was also supported by Heights Labs, by Convex Nexus Capital, by the Israel Science Foundation (grant number 2258/19), and by the Israel Science Foundation (ISF Grant 4101/25). Computational resources were provided in part by Google Cloud through its education credits program (credit 530550103).
+
+\section*{Declaration of competing interest}
+The author holds equity in Heights Labs and in Convex Nexus Capital and has a management role at Convex Nexus Capital. These entities are included in the funding declaration above.
+
+\section*{Declaration of generative AI and AI-assisted technologies}
+In November 2026 Claude Opus~5.5 (Anthropic), working in Claude Code and connected to Math Brain with the other agents named in the acknowledgements, developed the arguments, checked them against the cited theorems and wrote the paper. The question is that of Vardi, Shamir and Srebro~\cite{VSS}, and the dimension-free bound it starts from is due to Neyshabur, Tomioka and Srebro~\cite{NTS} and Golowich, Rakhlin and Shamir~\cite{GRS}. The upper bound combines the connection between ReLU networks and zonoids due to Bach~\cite{Bach} with the approximation of zonoids by zonotopes of Matou\v{s}ek~\cite{Matousek} and Siegel~\cite{Siegel}. Its rate is optimal by Bourgain, Lindenstrauss and Milman~\cite{BLM}. The lower bound rests on the Sobolev embedding of Mao, Siegel and Xu~\cite{MSX}. New here are the lower bound of Theorem~\ref{thm:main}(b) and, with it, the exponent of the class; Lemmas~\ref{lem:planar} and~\ref{lem:finite} are standard facts proved for completeness. The author directed the work and is responsible for the content of the paper and for decisions concerning its dissemination.
+
+\section*{Data availability}
+No data were generated. The \LaTeX{} source of the paper is available at \url{https://github.com/yspennstate/relu-fat-shattering-fixed-dimension/tree/v1.0}.
+
+\clearpage
+\appendix
+\input{notation}
+
+\begin{thebibliography}{99}
+\bibitem{ABCH} N.~Alon, S.~Ben-David, N.~Cesa-Bianchi and D.~Haussler, \emph{Scale-sensitive dimensions, uniform convergence, and learnability}, J. ACM 44 (1997), 615--631.
+\bibitem{Bach} F.~Bach, \emph{Breaking the curse of dimensionality with convex neural networks}, J. Mach. Learn. Res. 18 (2017), 1--53, arXiv:1412.8690.
+\bibitem{Bartlett98} P.~L.~Bartlett, \emph{The sample complexity of pattern classification with neural networks: the size of the weights is more important than the size of the network}, IEEE Trans. Inform. Theory 44 (1998), 525--536.
+\bibitem{BFT} P.~L.~Bartlett, D.~J.~Foster and M.~Telgarsky, \emph{Spectrally-normalized margin bounds for neural networks}, Adv. Neural Inf. Process. Syst. 30 (2017), arXiv:1706.08498.
+\bibitem{BLM} J.~Bourgain, J.~Lindenstrauss and V.~Milman, \emph{Approximation of zonoids by zonotopes}, Acta Math. 162 (1989), 73--141.
+\bibitem{GRS} N.~Golowich, A.~Rakhlin and O.~Shamir, \emph{Size-independent sample complexity of neural networks}, Inf. Inference 9 (2020), 473--504, arXiv:1712.06541.
+\bibitem{KS} M.~J.~Kearns and R.~E.~Schapire, \emph{Efficient distribution-free learning of probabilistic concepts}, J. Comput. System Sci. 48 (1994), 464--497.
+\bibitem{LQWP} T.~Liang, D.~Qiao, Y.-X.~Wang and R.~Parhi, \emph{Stable minima of ReLU neural networks suffer from the curse of dimensionality: the neural shattering phenomenon}, preprint (2025), arXiv:2506.20779.
+\bibitem{LDC} F.~Liu, L.~Dadi and V.~Cevher, \emph{Learning with norm constrained, over-parameterized, two-layer neural networks}, J. Mach. Learn. Res. 25 (2024), 1--42.
+\bibitem{Makovoz} Y.~Makovoz, \emph{Random approximants and neural networks}, J. Approx. Theory 85 (1996), 98--109.
+\bibitem{MSX} T.~Mao, J.~W.~Siegel and J.~Xu, \emph{Approximation rates for shallow ReLU$^k$ neural networks on Sobolev spaces via the Radon transform}, preprint (2025), arXiv:2408.10996v3.
+\bibitem{MV} D.~E.~McClure and R.~A.~Vitale, \emph{Polygonal approximation of plane convex bodies}, J. Math. Anal. Appl. 51 (1975), 326--358.
+\bibitem{Matousek} J.~Matou\v{s}ek, \emph{Improved upper bounds for approximation by zonotopes}, Acta Math. 177 (1996), 55--73.
+\bibitem{NTS} B.~Neyshabur, R.~Tomioka and N.~Srebro, \emph{Norm-based capacity control in neural networks}, Proc. 28th Conf. Learning Theory, PMLR 40 (2015), 1376--1401, arXiv:1503.00036.
+\bibitem{PN} R.~Parhi and R.~D.~Nowak, \emph{Near-minimax optimal estimation with shallow ReLU neural networks}, IEEE Trans. Inform. Theory 69 (2023), 1125--1140.
+\bibitem{Siegel} J.~W.~Siegel, \emph{Optimal approximation of zonoids and uniform approximation by shallow neural networks}, preprint (2025), arXiv:2307.15285v3.
+\bibitem{SX} J.~W.~Siegel and J.~Xu, \emph{Sharp bounds on the approximation rates, metric entropy, and $n$-widths of shallow neural networks}, Found. Comput. Math. 24 (2024), arXiv:2101.12365.
+\bibitem{VSS} G.~Vardi, O.~Shamir and N.~Srebro, \emph{The sample complexity of one-hidden-layer neural networks}, Adv. Neural Inf. Process. Syst. 35 (2022), arXiv:2202.06233.
+\bibitem{MathBrainRepo} Y.~Shmalo, \emph{Math Brain: public snapshot, code and tests}, 2026, \url{https://github.com/yspennstate/math-brain-public/tree/8c9a6bd478c4ec4082347151b7ae16db50c917dd}.
+\bibitem{MathBrainPaper} Y.~Shmalo, \emph{Math Brain: shared, auditable memory for multi-agent mathematical research}, October 2026, \url{https://github.com/yspennstate/math-brain-public/tree/main/papers/math-brain-2026-10-24}, doi:10.5281/zenodo.24150837.
+\bibitem{BrainFramework} Y.~Shmalo, \emph{Brain Framework}, public software repository, 2026, \url{https://github.com/yspennstate/brain-framework-public/tree/5629e644cdd510173ae97e9aa92642dabd22dc57}.
+\end{thebibliography}
+\end{document}
